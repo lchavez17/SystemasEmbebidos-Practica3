@@ -10,7 +10,7 @@ int contador_100ms=0;         //Declaramos variable contador para tiempo de 100m
 int contador_500ms=0;         //Declaramos variable contador para tiempo de 100ms. Sabremos cuantas veces se ha ejecutado la interrupción
 int contador_1000ms=0;        //Declaramos variable contador para tiempo de 100ms. Sabremos cuantas veces se ha ejecutado la interrupción
 int contador_1500ms=0;        //Declaramos variable contador para tiempo de 100ms. Sabremos cuantas veces se ha ejecutado la interrupción
-#int_TIMER0                  //Declaramos interrupción de TIMER0
+#int_timer0                  //Declaramos interrupción de TIMER0
 void TIMER0_funcion(void)    //Funcion de interupción de TIMER0. Cada que ocurra una interrupcion de TIMER0 ingcrementara en uno las variables de los contadores de tiempo
 {
    contador_100ms++;         
@@ -21,20 +21,23 @@ void TIMER0_funcion(void)    //Funcion de interupción de TIMER0. Cada que ocurr
    
    void main(void)
    {
-      int8 conAnilloA=0x80;             //Variable con el valor del valor para el contador de anillo del puerto A. Lo ponemos en el MSB
+      setup_oscillator(OSC_16MHZ);
+      SETUP_ADC_PORTS(NO_ANALOGS);
+      int8 conAnilloA=0x20;             //Variable con el valor del valor para el contador de anillo del puerto A. Lo ponemos en el MSB
       int8 conAnilloB=0x80;             //Variable con el valor del valor para el contador de anillo del puerto B. Lo ponemos en el MSB
       int8 conAnilloC=0x80;             //Variable con el valor del valor para el contador de anillo del puerto C. Lo ponemos en el MSB
-      int8 conAnilloD=0x80;             //Variable con el valor del valor para el contador de anillo del puerto D. Lo ponemos en el MSB
-      setup_timer_0(RTCC_INTERNAL|RTCC_DIV_256);   //Configuracion de la fuente y divisor del TMR0 <<<<<<Acomodar
+      int8 conAnilloD=0x80;             //Variable con el valor del valor para el contador de anillo del puerto D. Lo ponemos en el MSB}
+      set_timer0(0);
+      setup_timer_0(RTCC_INTERNAL|RTCC_DIV_256|T0_8_BIT);   //Configuracion de la fuente y divisor del TMR0 <<<<<<Acomodar
       enable_interrupts(int_TIMER0);  //Abilitamos la interrupcion TIMER0
-      enable_interrupts(GLOBAL);      //Abilitamos las interrupciones globales
+      enable_interrupts(GLOBAL);      //Abilitamos las interrupciones globales   
       //
       //Configuramos puertos A,B,C y D como puertos de salida
       set_tris_a(0);
       set_tris_b(0);
       set_tris_c(0);
       set_tris_d(0);
-      while(1)                        //Ciclo infinito
+      while(True)                        //Ciclo infinito
       {
          if(contador_100ms>=6)   //Si nuestro contador_100ms es mayor o igual a 6 quiere decir que ya han pasado 100ms desde que se desplazo conAnilloA entonces, se ejecuta contador de anillo del puerto A
          {
@@ -42,7 +45,7 @@ void TIMER0_funcion(void)    //Funcion de interupción de TIMER0. Cada que ocurr
             contador_100ms=0;          //Regresemos el valor de contador_100ms a 0
             if(conAnilloA==0)          //Si el valor de conAnilloA sobrepaso el LSM, devuelbe el valor al MSB
             {
-               conAnilloA=0x80; 
+               conAnilloA=0x20; 
             }
          }
          if(contador_500ms>=30)   //Si nuestro contador_500ms es mayor o igual a 30 quiere decir que ya han pasado 500ms desde que se desplazo conAnilloB entonces, se ejecuta contador de anillo del puerto B
@@ -60,7 +63,7 @@ void TIMER0_funcion(void)    //Funcion de interupción de TIMER0. Cada que ocurr
             contador_1000ms=0;         //Regresemos el valor de contador_1000ms a 0
             if(conAnilloC==0)          //Si el valor de conAnilloC sobrepaso el LSM, devuelbe el valor al MSB
             {
-               conAnilloC=0x10000000; 
+               conAnilloC=0x80; 
             }
          }
          if(contador_1500ms>=91)   //Si nuestro contador_1500ms es mayor o igual a 91 quiere decir que ya han pasado 1500ms desde que se desplazo conAnilloD entonces, se ejecuta contador de anillo del puerto D
